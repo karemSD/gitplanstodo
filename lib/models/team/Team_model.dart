@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/utils_service.dart';
 import '../tops/VarTopModel.dart';
 
 class TeamModel extends VarTopModel {
@@ -121,8 +122,8 @@ class TeamModel extends VarTopModel {
       mangerId: data['mangerId'],
       name: data['name'],
       imageUrl: data['imageUrl'],
-      createdAt: data['createdAt'],
-      updatedAt: data['updatedAt'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
     );
   }
   @override

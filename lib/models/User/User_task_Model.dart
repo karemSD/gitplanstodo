@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:developer' as dev;
+import '../../services/utils_service.dart';
 import '../team/Task_model.dart';
 
 //الكلاس الخاصة بالمهمة الخاصة بالمستخدم
@@ -351,10 +352,10 @@ class UserTaskModel extends TaskClass {
       taskFatherRef: data['taskFatherRef'],
       statusIdParameter: data['statusId'],
       importanceParameter: data['importance'],
-      createdAtParameter: data['createdAt'],
-      updatedAtParameter: data['updatedAt'],
-      startDateParameter: data['startDate'],
-      endDateParameter: data['endDate'],
+      createdAtParameter: data['createdAt'].toDate(),
+      updatedAtParameter: data['updatedAt'].toDate(),
+      startDateParameter: data['startDate'].toDate(),
+      endDateParameter: data['endDate'].toDate(),
     );
   }
   @override

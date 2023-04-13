@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/utils_service.dart';
 import '../tops/TopModel_model.dart';
 
 class ManagerModel with TopModel {
@@ -52,7 +53,8 @@ class ManagerModel with TopModel {
     Exception exception;
     //يأخذ الوقت ويجري عليه التعديلات الخاصة بوقت الفايربيز لتجري عمليات الوقت عليه بدون حدوث
     // اي خطأ في اعدادات الوقت المدخل ثم يرجعه
-    if (createdAt.isBefore(DateTime.now())) {
+    DateTime now = firebasetime(DateTime.now());
+    if (createdAt.isBefore(now)) {
       exception = Exception("created Time Can not be last time before now ");
       throw exception;
     }
@@ -92,8 +94,8 @@ class ManagerModel with TopModel {
     return ManagerModel.firestoreConstructor(
       id: data['id'],
       userId: data['userId'],
-      createdAt: data['createdAt'],
-      updatedAt: data['updatedAt'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
     );
   }
   @override

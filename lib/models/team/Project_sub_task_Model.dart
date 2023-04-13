@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
+import '../../services/utils_service.dart';
 import 'Task_model.dart';
 
 //الكلاس الخاص بالمهمة الفرعية في البروجيكت
@@ -8,7 +8,8 @@ import 'Task_model.dart';
 // so instead of making too much work we did this
 class ProjectsubTaskModel extends TaskClass {
   ProjectsubTaskModel(
-      {required String mainTaskId,
+      {required this.projectId,
+      required String mainTaskId,
       String? descriptionParameter,
       required String idParameter,
       required String nameParameter,
@@ -33,7 +34,8 @@ class ProjectsubTaskModel extends TaskClass {
   }
 
   ProjectsubTaskModel.firestoreConstructor(
-      {required this.mainTaskId,
+      {required this.projectId,
+      required this.mainTaskId,
       String? descriptionParameter,
       required String idParameter,
       required String nameParameter,
@@ -70,6 +72,11 @@ class ProjectsubTaskModel extends TaskClass {
     }
     assignedTo = assignedToParameter;
   }
+
+//بروجكت ايدي حسب طلب القائد لرغبات تخص مصلحة المشروع لعامة ضفتاه
+  late String projectId;
+
+  ///
 
   late String mainTaskId;
   //الدوكيومنت آي دي الخاص بالمهمة الأساسية في المشروع التي تندرج بداخلها المهمة الفرعية
@@ -127,10 +134,10 @@ class ProjectsubTaskModel extends TaskClass {
     }
     //TODO::don't forget to edit here
     //لا يمكن أن تتواجد مهمتان فرعيتان بنفس الاسم في نفس المهممة الأساسية
-    if (taskExist(nameParameter)) {
-      exception = Exception("task already been added");
-      throw exception;
-    }
+    // if (taskExist(nameParameter)) {
+    //   exception = Exception("task already been added");
+    //   throw exception;
+    // }
     name = nameParameter;
   }
 
@@ -225,7 +232,9 @@ class ProjectsubTaskModel extends TaskClass {
     }
     //تاريخ ووقت البداية البداية لا يمكن أن يكون قبل التاريخ والوقت الحالي
     //نذكر بأنه لا يمكن لأي شخص بالتفنيات الحالةي السفر عبر الزمن
-    if (startDateParameter.isBefore(DateTime.now())) {
+
+    DateTime now = firebasetime(DateTime.now());
+    if (startDateParameter.isBefore(now)) {
       exception = Exception(
           "project sub task start date must not be before the current day");
       throw exception;
@@ -282,6 +291,7 @@ class ProjectsubTaskModel extends TaskClass {
   ) {
     final data = snapshot.data()!;
     return ProjectsubTaskModel.firestoreConstructor(
+      projectId: data['projectId'],
       nameParameter: data['name'],
       idParameter: data['id'],
       assignedTo: data['assigned_to'],
@@ -289,20 +299,21 @@ class ProjectsubTaskModel extends TaskClass {
       mainTaskId: data['main_task_id'],
       statusIdParameter: data['statusId'],
       importanceParameter: data['importance'],
-      createdAtParameter: data['createdAt'],
-      updatedAtParameter: data['updatedAt'],
-      startDateParameter: data['startDate'],
-      endDateParameter: data['endDate'],
+      createdAtParameter: data['createdAt'].toDate(),
+      updatedAtParameter: data['updatedAt'].toDate(),
+      startDateParameter: data['startDate'].toDate(),
+      endDateParameter: data['endDate'].toDate(),
     );
   }
   @override
   Map<String, dynamic> toFirestore() {
     return {
+      'projectId': projectId,
       'name': name,
       'id': id,
       'description': description,
-      'main_task_id': mainTaskId,
-      'assigned_to': assignedTo,
+      'mainTaskId': mainTaskId,
+      'assignedTo': assignedTo,
       'statusId': statusId,
       'importance': importance,
       'createdAt': createdAt,

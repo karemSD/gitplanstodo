@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/utils_service.dart';
 import '../tops/VarTopModel.dart';
 
 class UserTaskCategoryModel extends VarTopModel {
@@ -22,8 +23,8 @@ class UserTaskCategoryModel extends VarTopModel {
     setUserId = userId;
     setName = name;
     setId = id;
-    setUpdatedAt = updatedAt;
     setCreatedAt = createdAt;
+    setUpdatedAt = updatedAt;
   }
 
   UserTaskCategoryModel.firestoreConstructor(
@@ -107,7 +108,7 @@ class UserTaskCategoryModel extends VarTopModel {
       exception = Exception("Name cannot be Empty");
       throw exception;
     }
-    if (name.length <= 3) {
+    if (name.length < 3) {
       //لايمكن ان يكون الاسم مألف من اقل من ثلاث محارف
       exception = Exception("Name cannot be less than 3 characters");
       throw exception;
@@ -122,12 +123,12 @@ class UserTaskCategoryModel extends VarTopModel {
     SnapshotOptions? options,
   ) {
     Map<String, dynamic>? data = snapshot.data()!;
-    return UserTaskCategoryModel(
+    return UserTaskCategoryModel.firestoreConstructor(
       id: data['id'],
       userId: data['userId'],
       name: data['name'],
-      createdAt: data['createdAt'],
-      updatedAt: data['updatedAt'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
     );
   }
   //لترحيل البيانات القادمة  من مودل على شكل جيسون (ماب) إلى الداتا بيز

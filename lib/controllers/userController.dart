@@ -1,63 +1,137 @@
-import 'package:auth_with_koko/controllers/topController.dart';
+import 'package:auth_with_koko/collectionsrefrences.dart';
+import 'package:auth_with_koko/controllers/categoryController.dart';
+import 'package:auth_with_koko/controllers/manger_controller.dart';
+import 'package:auth_with_koko/controllers/team_member_controller.dart';
+import 'package:auth_with_koko/controllers/testController.dart';
+import 'package:auth_with_koko/models/User/User_model.dart';
+import 'package:auth_with_koko/models/User/User_task_Model.dart';
+import 'package:auth_with_koko/models/task/UserTaskCategory_model.dart';
+import 'package:auth_with_koko/models/team/Manger_model.dart';
+import 'package:auth_with_koko/models/team/TeamMembers_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 
-import '../collectionsrefrences.dart';
-import '../models/User/User_model.dart';
-import 'user_task_controller.dart';
-
-class UserController extends TopController {
-  final userModel = Rxn<UserModel>();
-  addUserDoc(UserModel userModel) {
-    addDoc(usersRef, userModel);
+class UserController extends TestController {
+  Future<UserModel> getUserById({required String id}) async {
+    DocumentSnapshot doc = await getDocById(reference: usersRef, id: id);
+    return doc.data() as UserModel;
   }
 
-  Future<void> deleteUser(String id) async {
-    await delDoc(usersRef, id);
+  Future<UserModel> getUserOfTask({required String userTaskId}) async {
+    DocumentSnapshot userTaskDoc = await usersTasksRef.doc(userTaskId).get();
+    UserTaskModel userTaskModel = userTaskDoc.data() as UserTaskModel;
+    //القسم الفوقاني بهل الميثود بيستبدل بجلب الميثود عن طريق الايدي بس ليصير موجود كونترولر التاسك يوزر جاهز
+    DocumentSnapshot userDoc =
+        await getDocById(reference: usersRef, id: userTaskModel.userId);
+    return userDoc.data() as UserModel;
   }
 
-  Stream<QuerySnapshot<Object?>> getUserData(String userId) {
-    return (query1(reference: usersRef, field: "id", value: userId));
+  Stream<DocumentSnapshot<UserModel>> getUserOfTaskStream(
+      {required String userTaskId}) async* {
+    DocumentSnapshot userTaskDoc = await usersTasksRef.doc(userTaskId).get();
+    UserTaskModel userTaskModel = userTaskDoc.data() as UserTaskModel;
+    //القسم الفوقاني بهل الميثود بيستبدل بجلب الميثود عن طريق الايدي بس ليصير موجود كونترولر التاسك يوزر جاهز
+    Stream<DocumentSnapshot> stream =
+        getDocByIdStream(reference: usersRef, id: userTaskModel.userId);
+    yield* stream.cast<DocumentSnapshot<UserModel>>();
   }
 
-  Stream<QuerySnapshot<Object?>> getUserDataSnapshot(String userId) {
-    return (query1(reference: usersRef, field: "id", value: userId));
+//
+  Future<UserModel> getUserOfCategory({required String categoryId}) async {
+    TaskCategoryController taskCategoryController =
+        Get.put(TaskCategoryController());
+    UserTaskCategoryModel userTaskCategoryModel =
+        await taskCategoryController.getCategoryById(id: categoryId);
+    UserModel userModel = await getUserById(id: userTaskCategoryModel.userId);
+    return userModel;
   }
 
-  Future<UserModel> getbyid(String id) async {
-    UserModel s = (await query(reference: usersRef, field: "id", value: id))
-        .docs[0]
-        .data() as UserModel;
-    print(s);
-    return s;
+  getUserOfcategoryStream({required String categoryId}) async* {
+    TaskCategoryController taskCategoryController =
+        Get.put(TaskCategoryController());
+    UserTaskCategoryModel userTaskCategoryModel =
+        await taskCategoryController.getCategoryById(id: categoryId);
+   Stream<DocumentSnapshot> stream= getDocByIdStream(reference: usersRef, id: userTaskCategoryModel.userId);
+  yield* stream.cast<DocumentSnapshot<UserModel>>(); 
   }
 
-  Future<UserModel> getUserDocById(String uid) async {
-    return (await getDocById(usersRef, uid)).data() as UserModel;
+  ///
+  Stream<DocumentSnapshot<UserModel>> getUserByIdStream({required String id}) {
+    Stream<DocumentSnapshot> stream =
+        getDocByIdStream(reference: usersRef, id: id);
+    return stream.cast<DocumentSnapshot<UserModel>>();
   }
 
-  // Future<void> getUserDocs(UserModel userModel) async {
-  //   // await getDoc(usersRef, id);
-  //   // print(
-  //   //   (await usersRef.doc(userModel.id).get()).data(),
-  //   // );
-  //   List<QueryDocumentSnapshot<UserModel>> list = (await getDoc(
-  //           model: userModel,
-  //           field: "tokenFcm",
-  //           reference: usersRef,
-  //           value: userModel.tokenFcm[0])
-  //       as List<QueryDocumentSnapshot<UserModel>>);
-  //   list.forEach((element) {
-  //     print(element.data() as UserModel);
-  //   });
-  // }
-
-  Future<void> deleteUserDoc(UserModel userModel) async {
-    deleteDoc(usersRef, userModel);
+  Future<UserModel> getUserWhereMangerIs({required String mangerId}) async {
+    MangerController mangerController = Get.put(MangerController());
+    ManagerModel managerModel =
+        await mangerController.getMangerById(id: mangerId);
+    DocumentSnapshot userDoc =
+        await getDocById(reference: usersRef, id: managerModel.userId);
+    return userDoc.data() as UserModel;
   }
 
-  UserTaskController taskController = Get.put(UserTaskController());
-  Future<void> deleteAllUserCategories(String userId) async {
-    deleteAll(userTaskCategoryRef, "userId", userId);
+  Stream<DocumentSnapshot<UserModel>> getUserWhereMangerIsStream(
+      {required String mangerId}) async* {
+    MangerController mangerController = Get.put(MangerController());
+    ManagerModel managerModel =
+        await mangerController.getMangerById(id: mangerId);
+    Stream<DocumentSnapshot> stream =
+        getDocByIdStream(reference: usersRef, id: managerModel.userId);
+    yield* stream.cast<DocumentSnapshot<UserModel>>();
+  }
+
+  Future<UserModel> getUserWhereMemberIs({required String memberId}) async {
+    TeamMemberController memberController = Get.put(TeamMemberController());
+    TeamMemberModel member =
+        await memberController.getMemberById(memberId: memberId);
+    DocumentSnapshot userDoc =
+        await getDocById(reference: usersRef, id: member.userId);
+    return userDoc.data() as UserModel;
+  }
+
+  Stream<DocumentSnapshot<UserModel>> getUserWhereMamberIsStream(
+      {required String memberId}) async* {
+    TeamMemberController memberController = Get.put(TeamMemberController());
+    TeamMemberModel member =
+        await memberController.getMemberById(memberId: memberId);
+    Stream<DocumentSnapshot> stream =
+        getDocByIdStream(reference: usersRef, id: member.userId);
+    yield* stream.cast<DocumentSnapshot<UserModel>>();
+  }
+
+  Future<void> createUser({required UserModel userModel}) async {
+    await addDoc(reference: usersRef, model: userModel);
+  }
+
+  Future<void> updateUser(
+      {required Map<String, dynamic> data, required String id}) async {
+    await updateNonRelationalFields(reference: usersRef, data: data, id: id);
+  }
+
+  Future<void> deleteUser({required String id}) async {
+    MangerController mangerController = Get.put(MangerController());
+    WriteBatch batch = fireStore.batch();
+    List<DocumentSnapshot> membrs = await getDocsWhere(
+        collectionReference: teamMembersRef, field: "userId", value: id);
+    List<DocumentSnapshot> listAllSubTasks = [];
+    deleteAllUsingBatch(list: membrs, refbatch: batch);
+    for (var member in membrs) {
+      List<DocumentSnapshot> listOfSubTasks = await getDocsWhere(
+          collectionReference: projectSubTasksRef,
+          field: "assignedTo",
+          value: member.id);
+      listAllSubTasks.addAll(listOfSubTasks);
+    }
+    deleteAllUsingBatch(list: listAllSubTasks, refbatch: batch);
+    //  UserModel userModel = await getUserById(id: id);
+    // firebaseStorage.refFromURL(userModel.imageUrl).delete();
+    ManagerModel? managerModel =
+        await mangerController.getMangerWhereUserIs(userId: id);
+    await deleteDocUsingBatch(
+        documentSnapshot: await usersRef.doc(id).get(), refbatch: batch);
+
+    await mangerController.deleteManger(
+        id: managerModel!.id, writeBatch: batch);
   }
 }

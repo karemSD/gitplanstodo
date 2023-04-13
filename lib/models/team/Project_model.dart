@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../services/utils_service.dart';
 import '../tops/Var2TopModel.dart';
 
 class ProjectModel extends Var2TopModel {
@@ -13,7 +12,7 @@ class ProjectModel extends Var2TopModel {
     required String name,
     required String imageUrl,
     String? description,
-    required String teamId,
+    String? teamId,
     required String stausId,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -40,7 +39,7 @@ class ProjectModel extends Var2TopModel {
     required this.imageUrl,
     String? description,
     required this.teamId,
-    required String stausId,
+    required String statusId,
     required DateTime createdAt,
     required DateTime updatedAt,
     required DateTime startDate,
@@ -56,11 +55,11 @@ class ProjectModel extends Var2TopModel {
   }
   late String mangerId;
 
-  late String teamId;
+  late String? teamId;
   final _regex = RegExp(r'^[\p{P}\p{S}\p{N}]+$');
   //ايدي الفريق المسؤول عن هذا المشروع لايمكن ان يكون فارغ
   late String imageUrl;
-  set setTeamId(String teamId) {
+  set setTeamId(String? teamId) {
     // TODO   //CheckExist(teamId,collectionName);هون منحط الميثود المسؤولة عن التأكد من وجود هل الفريق بالداتا بيز او لأ
     // مجرد مايكون التيم بالداتا بيز معناها هو محقق الشروط
     this.teamId = teamId;
@@ -92,17 +91,18 @@ class ProjectModel extends Var2TopModel {
   @override
   set setCreatedAt(DateTime createdAt) {
     Exception exception;
+    DateTime now = firebasetime(DateTime.now());
     //يأخذ الوقت ويجري عليه التعديلات الخاصة بوقت الفايربيز لتجري عمليات الوقت عليه بدون حدوث اي خطأ في اعدادات الوقت المدخل ثم يرجعه
-    if (createdAt.isBefore(DateTime.now())) {
+    if (createdAt.isBefore(now)) {
       exception =
           Exception("created Time Can not be in the past of the mean time");
       throw exception;
     }
-    if (createdAt.isAfter(DateTime.now())) {
-      exception =
-          Exception("created Time Can not in the future of the mean time");
-      throw exception;
-    }
+    // if (createdAt.isAfter(now)) {
+    //   exception =
+    //       Exception("created Time Can not in the future of the mean time");
+    //   throw exception;
+    // }
 
     this.createdAt = firebasetime(createdAt);
   }
@@ -215,18 +215,20 @@ class ProjectModel extends Var2TopModel {
       name: data['name'],
       teamId: data['teamId'],
       imageUrl: data['imageUrl'],
-      stausId: data['stausId'],
+      statusId: data['statusId'],
       description: data['description'],
-      createdAt: data['createdAt'],
-      updatedAt: data['upadateAt'],
-      startDate: data['startDate'],
-      endDate: data['endDate'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
+      startDate: data['startDate'].toDate(),
+      endDate: data['endDate'].toDate(),
     );
   }
   @override
   //لترحيل البيانات القادمة  من مودل على شكل جيسون (ماب) إلى الداتا بيز
   Map<String, dynamic> toFirestore() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['mangerId'] = mangerId;
     data['id'] = id;
     data['teamId'] = teamId;
     data['statusId'] = statusId;

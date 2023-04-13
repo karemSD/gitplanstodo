@@ -1,5 +1,5 @@
-import 'package:auth_with_koko/controllers/topController.dart';
+import 'package:auth_with_koko/controllers/testController.dart';
 
-class StatusController extends TopController{
+class StatusController extends TestController{
   
 }

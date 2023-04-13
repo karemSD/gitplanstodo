@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/utils_service.dart';
 import '../tops/TopModel_model.dart';
 
 class TeamMemberModel with TopModel {
@@ -107,12 +108,12 @@ class TeamMemberModel with TopModel {
   ) {
     final data = snapshot.data()!;
 
-    return TeamMemberModel(
+    return TeamMemberModel.firestoreConstructor(
       id: data['id'],
       userId: data['userId'],
       teamId: data['teamId'],
-      createdAt: data['createdAt'],
-      updatedAt: data['updatedAt'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
     );
   }
   @override

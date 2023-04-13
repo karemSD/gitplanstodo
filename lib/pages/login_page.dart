@@ -1,5 +1,8 @@
+import 'package:auth_with_koko/controllers/testController.dart';
+import 'package:auth_with_koko/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -33,8 +36,9 @@ class _LoginPageState extends State<LoginPage> {
 
     await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: userEmailController.text, password: passwordController.text);
-
-    Navigator.pop(context);
+    if (mounted) {
+      Navigator.pop(context);
+    }
   }
 
   void errorMessage(String message) {
@@ -55,6 +59,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    //test();
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
@@ -73,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
 
                 //say Hi
                 Text(
-                  'Nice to see You!',
+                  'Nice to sees You!',
                   style: GoogleFonts.pacifico(fontSize: 30),
                 ),
                 const SizedBox(

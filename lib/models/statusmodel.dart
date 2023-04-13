@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../services/utils_service.dart';
 import 'tops/VarTopModel.dart';
 
 class StatusModel extends VarTopModel {
@@ -28,7 +29,8 @@ class StatusModel extends VarTopModel {
     Exception exception;
     //يأخذ الوقت ويجري عليه التعديلات الخاصة بوقت الفايربيز لتجري عمليات الوقت عليه بدون حدوث
     // اي خطأ في اعدادات الوقت المدخل ثم يرجعه
-    if (createdAtParamter.isBefore(DateTime.now())) {
+    DateTime now = firebasetime(DateTime.now());
+    if (createdAtParamter.isBefore(now)) {
       exception = Exception("created Time Can not be in the past");
       throw exception;
     }
@@ -86,8 +88,8 @@ class StatusModel extends VarTopModel {
     return StatusModel.firestoreConstructor(
       name: data['name'],
       id: data['id'],
-      createdAt: data['createdAt'],
-      updatedAt: data['updatedAt'],
+      createdAt: data['createdAt'].toDate(),
+      updatedAt: data['updatedAt'].toDate(),
     );
   }
   @override

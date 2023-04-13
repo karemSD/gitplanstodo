@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:email_validator/email_validator.dart';
 
 import '../../services/auth_service.dart';
+import '../../services/utils_service.dart';
 import '../tops/VarTopModel.dart';
 
 class UserModel extends VarTopModel {
@@ -240,7 +241,7 @@ class UserModel extends VarTopModel {
     // Timestamp dateTimeCreatedAt = data['createdAt'];
     // Timestamp dateTimeUpdatedAt = data['updatedAt'];
     //
-
+    
     //
     return UserModel.firestoreConstructor(
       name: data['name'],
@@ -249,6 +250,8 @@ class UserModel extends VarTopModel {
       imageUrl: data['imageUrl'],
       email: data['email'],
       tokenFcm: data['tokenFcm'].cast<String>(),
+      // TODO 
+      //id: snapshot.id,
       id: data['id'],
       createdAt: data['createdAt'].toDate(),
       updatedAt: data['updatedAt'].toDate(),

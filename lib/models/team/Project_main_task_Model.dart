@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../services/utils_service.dart';
 import 'Task_model.dart';
 //TODO use the firebase time
 
@@ -86,9 +87,7 @@ class ProjectMainTaskModel extends TaskClass {
   }
 
   // TODO:this method is just for demo make the method to make a query in firebase to know that if the task name already been stored in the firebase for this project for this model
-  bool taskExist(String taskName) {
-    return true;
-  }
+
 
   @override
   set setName(String nameParameter) {
@@ -106,10 +105,10 @@ class ProjectMainTaskModel extends TaskClass {
     }
     //لا يمكن أن تتواجد مهمتان أساسيتان بنفس الاسم في نفس البروجيكت
     //TODO: write the function taskExist
-    if (taskExist(nameParameter)) {
-      exception = Exception("task already been added");
-      throw exception;
-    }
+    // if (taskExist(nameParameter)) {
+    //   exception = Exception("task already been added");
+    //   throw exception;
+    // }
     name = nameParameter;
   }
 
@@ -231,18 +230,14 @@ class ProjectMainTaskModel extends TaskClass {
     //تاريخ ووقت البداية البداية لا يمكن أن يكون قبل التاريخ والوقت الحالي
     //نذكر بأنه لا يمكن لأي شخص بالتفنيات الحالةي السفر عبر الزمن
     startDateParameter = firebasetime(startDateParameter);
-
-    if (startDateParameter.isBefore(DateTime.now())) {
+    DateTime now = firebasetime(DateTime.now());
+    if (startDateParameter.isBefore(now)) {
       exception = Exception(
           "project main task start date must not be before the current day");
       throw exception;
     }
     //تاريخ ووقت بداية المهمة الأساسية لا يمكن أن يكون بعد تاريخ ووقت نهاية المهمة بديهياً
-    if (startDateParameter.isAfter(endDate!)) {
-      exception =
-          Exception("project main task start date can't be after end date");
-      throw exception;
-    }
+
     //لا يمكن أن يكون هناك فارق أقل من 5 دقائق بين بداية المهمة الأساسية ونهايتها
 
     //TODO هل يجب ان نحذر قائد الفريق  من وجود مهام في نفس الوقت
@@ -300,10 +295,10 @@ class ProjectMainTaskModel extends TaskClass {
       projectId: data['project_id'],
       statusIdParameter: data['statusId'],
       importanceParameter: data['importance'],
-      createdAtParameter: data['createdAt'],
-      updatedAtParameter: data['updatedAt'],
-      startDateParameter: data['startDate'],
-      endDateParameter: data['endDate'],
+      createdAtParameter: data['createdAt'].toDate(),
+      updatedAtParameter: data['updatedAt'].toDate(),
+      startDateParameter: data['startDate'].toDate(),
+      endDateParameter: data['endDate'].toDate(),
     );
   }
   @override
@@ -312,7 +307,7 @@ class ProjectMainTaskModel extends TaskClass {
       'name': name,
       'id': id,
       'description': description,
-      'project_id': projectId,
+      'projectId': projectId,
       'statusId': statusId,
       'importance': importance,
       'createdAt': createdAt,
